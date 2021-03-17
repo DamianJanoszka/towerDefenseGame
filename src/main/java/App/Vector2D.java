@@ -1,10 +1,26 @@
 package App;
 
-public class Vector2D {
+import java.util.Comparator;
+
+public class Vector2D implements Comparator<Vector2D> {
 
     public double x;
     public double y;
 
+    @Override
+    public String toString() {
+        return "Vector2D "  +
+                "x=" + x +
+                ", y=" + y;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 
     public Vector2D(double x, double y) {
         this.x = x;
@@ -62,4 +78,23 @@ public class Vector2D {
         return Math.atan2(y, x);
     }
 
+    public boolean isGreaterThan(Vector2D v) {
+        if(x>v.getX()&& y>v.getY()) {
+            return true;
+        }
+        else
+            return false;
+    }
+    public boolean isLessThan(Vector2D v) {
+        if(x<v.getX()&& y<v.getY()) {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    @Override
+    public int compare(Vector2D o1, Vector2D o2) {
+        return 0;
+    }
 }

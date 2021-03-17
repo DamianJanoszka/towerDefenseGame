@@ -12,7 +12,7 @@ import java.util.List;
 public class Monster extends Sprite {
 
 
-    public static int MONSTER_COUNT = 1;
+    public static int MONSTER_COUNT = 7;
 
     public Monster(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
@@ -33,5 +33,10 @@ public class Monster extends Sprite {
         return circle;
     }
 
-
+    @Override
+    public String toString() {
+        return "Monster{" +
+                "location=" + location +
+                '}';
+    }
 }

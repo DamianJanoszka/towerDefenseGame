@@ -11,8 +11,8 @@ public abstract class Sprite extends Region {
     Vector2D acceleration;
 
 
-    double maxSpeed=2.0;
-    double maxForce=0.08;
+    double maxSpeed=0.5;
+    double maxForce=0.05;
 
 
     Node view;
@@ -59,6 +59,20 @@ public abstract class Sprite extends Region {
     public Vector2D getLocation(){
         return location;
     }
+    public Vector2D addTolerance(){
+        double x = location.x*1.02;
+        double y = location.y*1.02;
+        return new Vector2D(x,y);
+    }
+    public Vector2D subtractTolerance(){
+        double x = location.x*0.98;
+        double y = location.y*0.98;
+        return new Vector2D(x,y);
+    }
+    public void setLocation(double x, double y){
+        location.x=x;
+        location.y=y;
+    }
     public void applyForce(Vector2D force){
         acceleration.add(force);
     };
@@ -66,7 +80,6 @@ public abstract class Sprite extends Region {
     public void follow(Vector2D target){
        Vector2D coordinate = Vector2D.subtract(target,location);
 
-       double distance = coordinate.magnitude();
        coordinate.normalize();
        coordinate.multiply(maxSpeed);
 
@@ -81,7 +94,6 @@ public abstract class Sprite extends Region {
         velocity.add(acceleration);
         velocity.limit(maxSpeed);
         location.add(velocity);
-        //angle=velocity.heading2D();
         acceleration.multiply(0);
     }
 

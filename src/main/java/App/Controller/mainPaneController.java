@@ -15,14 +15,16 @@ public class mainPaneController {
     List<Monster> allMonsters = new ArrayList<>();
     List<Attractor> allAttractors = new ArrayList<>();
     AnimationTimer gameLoop;
+    int tmp1=0;
+    int tmp2=0;
 
     private void addMonsters() {
         // start location
-        double x = 0.5 * playBoard.getPrefWidth();
+        double x = 1 * playBoard.getPrefWidth() + 30;
         double y = 0.5 * playBoard.getPrefHeight();
         // enemy size
         double width = 30;
-        double height = width;
+        double height = width+1;
 
         // create monster data
         Vector2D location = new Vector2D( x,y);
@@ -41,7 +43,7 @@ public class mainPaneController {
         double y = 0.5 * playBoard.getPrefHeight();
 
         double width = 40;
-        double height = width;
+        double height = width+1;
 
         // create checkPoint data
         Vector2D location = new Vector2D( x,y);
@@ -53,21 +55,10 @@ public class mainPaneController {
         allAttractors.add(attractor);
     }
     private void startGame() {
-
-        // start game
         gameLoop = new AnimationTimer() {
-
             @Override
             public void handle(long now) {
-                Attractor attractor = allAttractors.get(0);
-                allMonsters.forEach(monster->{
-                    monster.follow(attractor.getLocation());
-                });
-                allMonsters.forEach(Sprite::move);
-                // update scene
-                allMonsters.forEach(Sprite::display);
-                allAttractors.forEach(Sprite::display);
-
+                monsterRoute();
             }
         };
 
@@ -77,13 +68,86 @@ public class mainPaneController {
 
     public void initialize(){
 
+        // adding checkPoints and monsters
+        prepareGame();
+        // setting checkPoints
+        prepareMap();
+        // run animation loop
+        startGame();
+    }
+
+    private void prepareGame() {
         for(int i = 0; i < Monster.MONSTER_COUNT; i++) {
             addMonsters();
         }
         for(int i = 0; i < Attractor.ATTRACTOR_COUNT; i++) {
             addAttractor();
         }
-        // run animation loop
-        startGame();
+    }
+
+    private void prepareMap() {
+        allAttractors.get(0).setLocation(0.5 * playBoard.getPrefWidth(),0.8 * playBoard.getPrefHeight());
+        allAttractors.get(1).setLocation(0.5 * playBoard.getPrefWidth(),0.1 * playBoard.getPrefHeight());
+        allAttractors.get(2).setLocation(0.1 * playBoard.getPrefWidth(),0.1 * playBoard.getPrefHeight());
+    }
+
+    private void monsterRoute() {
+        for (int i = 0 ; i < Monster.MONSTER_COUNT; i++) {
+            monsterMove(i);
+        }
+
+        // move monsters
+        allMonsters.forEach(Sprite::move);
+
+        // update scene
+        allMonsters.forEach(Sprite::display);
+        allAttractors.forEach(Sprite::display);
+
+    }
+    public void monsterMove(int i){
+        Vector2D firstBase=allAttractors.get(0).getLocation();
+        Vector2D secondBase=allAttractors.get(1).getLocation();
+        Vector2D thirdBase=allAttractors.get(2).getLocation();
+
+        Monster nthMonster=allMonsters.get(i);
+
+        // monster move logic
+        if( (tmp1==0 && tmp2==0) &&
+                !( (nthMonster.addTolerance().isGreaterThan(firstBase)) &&
+                        (nthMonster.subtractTolerance().isLessThan(firstBase))) )
+            {
+                nthMonster.follow(firstBase);
+            }
+        else if( (nthMonster.addTolerance().isGreaterThan(firstBase)) &&
+                (nthMonster.subtractTolerance().isLessThan(firstBase)) )
+            {
+                nthMonster.follow(secondBase);
+                tmp1=1;
+                tmp2=0;
+                System.out.println("FIRST BASE");
+
+            }
+        else if( (nthMonster.addTolerance().isGreaterThan(secondBase)) &&
+                (nthMonster.subtractTolerance().isLessThan(secondBase)) )
+            {
+                nthMonster.follow(thirdBase);
+                tmp2=1;
+                tmp1=0;
+                System.out.println("SECOND BASE");
+            }
+        else if( tmp1==1){
+            nthMonster.follow(secondBase);
+        }
+        else if( tmp2==1 && !(nthMonster.addTolerance().isGreaterThan(thirdBase) &&
+                nthMonster.subtractTolerance().isLessThan(thirdBase)) )
+            {
+                nthMonster.follow(thirdBase);
+            }
+        else if( tmp2==1 && (nthMonster.addTolerance().isGreaterThan(thirdBase) &&
+                nthMonster.subtractTolerance().isLessThan(thirdBase)) )
+            {
+                System.out.println("LAST BASE");
+                gameLoop.stop();
+            }
     }
 }
