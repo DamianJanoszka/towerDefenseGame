@@ -11,13 +11,29 @@ import java.util.List;
 
 public class Monster extends Sprite {
 
+    public static int MONSTER_COUNT = 3;
+    public static int MONSTER_HEALTH=50;
 
-    public static int MONSTER_COUNT = 7;
+    private int monsterHealth;
 
     public Monster(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
+        setMonsterHealth(MONSTER_HEALTH);
     }
 
+    public int getMonsterHealth() {
+        return monsterHealth;
+    }
+
+    public void setMonsterHealth(int monsterHealth) {
+        this.monsterHealth = monsterHealth;
+    }
+
+    public void healthAfterHit(Missile missile){
+        int health = getMonsterHealth();
+        int amount = missile.getMissileDamage();
+        setMonsterHealth(health-amount);
+    }
 
     @Override
     public Node createView() {
