@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity"
             maxWidth="-Infinity"
@@ -15,4 +19,18 @@
    <center>
       <Pane fx:id="playBoard" prefHeight="400.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </center>
+   <left>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="playButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Play">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="2.0" />
+               </VBox.margin></Button>
+            <ToggleButton fx:id="pauseButton_v2" mnemonicParsing="false" text="Pause">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin></ToggleButton>
+         </children>
+      </VBox>
+   </left>
 </BorderPane>

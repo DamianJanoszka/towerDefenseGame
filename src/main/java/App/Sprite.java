@@ -11,10 +11,10 @@ public abstract class Sprite extends Region {
     Vector2D acceleration;
 
 
-    double maxSpeed=1;
+    double maxSpeed=0.8;
     double missileSpeed=5;
     double maxForce=0.5;
-    double maxForceM=0.8;
+    double maxForceM=0.7;
 
 
     Node view;
@@ -115,6 +115,14 @@ public abstract class Sprite extends Region {
         steer.limit(maxForce);
 
         applyForce(steer);
+    }
+    public boolean isInRange(Monster monster, Missile missile){
+        return monster.addMissileTolerance().isGreaterThan(missile.getLocation()) &&
+                        (monster.subtractMissileTolerance().isLessThan(missile.getLocation()));
+    }
+    public boolean isInCheckPoint(Monster monster, Vector2D location){
+        return monster.addTolerance().isGreaterThan(location) &&
+                (monster.subtractTolerance().isLessThan(location));
     }
 
 }

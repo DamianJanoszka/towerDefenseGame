@@ -11,14 +11,16 @@ import java.util.List;
 
 public class Monster extends Sprite {
 
-    public static int MONSTER_COUNT = 3;
+    public static int MONSTER_COUNT = 4;
     public static int MONSTER_HEALTH=50;
-
+    public static int MONSTER_FLAG=0;
     private int monsterHealth;
+    private int flag;
 
     public Monster(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
         setMonsterHealth(MONSTER_HEALTH);
+        setFlag(MONSTER_FLAG);
     }
 
     public int getMonsterHealth() {
@@ -27,6 +29,14 @@ public class Monster extends Sprite {
 
     public void setMonsterHealth(int monsterHealth) {
         this.monsterHealth = monsterHealth;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
     }
 
     public void healthAfterHit(Missile missile){
