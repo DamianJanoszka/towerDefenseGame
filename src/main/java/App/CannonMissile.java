@@ -5,14 +5,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public class Missile extends Sprite{
-    public static final int MISSILE_COUNT = 1;
+public class CannonMissile extends Sprite{
 
     private int missileDamage;
+    private int cannonID;
 
-    public Missile(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
+
+    public CannonMissile(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
         setMissileDamage(10);
+        setCannonID(0);
     }
 
     public int getMissileDamage() {
@@ -23,6 +25,13 @@ public class Missile extends Sprite{
         this.missileDamage = missileDamage;
     }
 
+    public void setCannonID(int cannonID) {
+        this.cannonID = cannonID;
+    }
+
+    public int getCannonID() {
+        return cannonID;
+    }
 
     @Override
     public Node createView() {

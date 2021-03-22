@@ -1,26 +1,21 @@
 package App;
 
 
+import App.GameSettings.Settings;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Monster extends Sprite {
 
-    public static int MONSTER_COUNT = 4;
-    public static int MONSTER_HEALTH=50;
-    public static int MONSTER_FLAG=0;
     private int monsterHealth;
     private int flag;
 
     public Monster(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
-        setMonsterHealth(MONSTER_HEALTH);
-        setFlag(MONSTER_FLAG);
+        setMonsterHealth(Settings.MONSTER_HEALTH);
+        setFlag(Settings.MONSTER_FLAG);
     }
 
     public int getMonsterHealth() {
@@ -39,9 +34,9 @@ public class Monster extends Sprite {
         this.flag = flag;
     }
 
-    public void healthAfterHit(Missile missile){
+    public void healthAfterHit(CannonMissile cannonMissile){
         int health = getMonsterHealth();
-        int amount = missile.getMissileDamage();
+        int amount = cannonMissile.getMissileDamage();
         setMonsterHealth(health-amount);
     }
 

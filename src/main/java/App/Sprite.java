@@ -1,5 +1,6 @@
 package App;
 
+import App.GameSettings.Settings;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -68,10 +69,10 @@ public abstract class Sprite extends Region {
         return toleranceAmount(0.98);
     }
     public Vector2D addMissileTolerance(){
-        return toleranceAmount(1.04);
+        return toleranceAmount(1.06);
     }
     public Vector2D subtractMissileTolerance(){
-        return toleranceAmount(0.96);
+        return toleranceAmount(0.94);
     }
     public Vector2D toleranceAmount(double amount){
         double x = location.x*amount;
@@ -86,7 +87,10 @@ public abstract class Sprite extends Region {
         acceleration.add(force);
     };
     public void attack(Vector2D target){
-        followTarget(target,location,missileSpeed,maxForceM,velocity);
+        Vector2D range = Vector2D.subtract(target,location);
+        double distance = range.magnitude();
+        if(distance < Settings.CANNON_RANGE){
+        followTarget(target,location,missileSpeed,maxForceM,velocity);}
     }
     public void moveMissile() {
         moveObject(acceleration,velocity,missileSpeed,location);
@@ -94,7 +98,6 @@ public abstract class Sprite extends Region {
     public void follow(Vector2D target){
         followTarget(target,location,maxSpeed,maxForce,velocity);
     }
-
     public void moveMonster() {
         moveObject(acceleration,velocity,maxSpeed,location);
     }
@@ -116,7 +119,7 @@ public abstract class Sprite extends Region {
 
         applyForce(steer);
     }
-    public boolean isInRange(Monster monster, Missile missile){
+    public boolean isInRange(Monster monster, CannonMissile missile){
         return monster.addMissileTolerance().isGreaterThan(missile.getLocation()) &&
                         (monster.subtractMissileTolerance().isLessThan(missile.getLocation()));
     }
