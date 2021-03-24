@@ -137,7 +137,7 @@ public class mainPaneController {
         // adding checkPoints and monsters
         prepareGame();
 
-        // setting checkPoints
+        // setting checkPoints and cannons
         prepareMap();
 
         // update scene
@@ -156,7 +156,7 @@ public class mainPaneController {
         for (int i = 0; i < Settings.CANNON_COUNT; i++) {
             addCannon();
         }
-        for (int i = 0; i < Settings.MISSILE_COUNT; i++) {
+        for (int i = 0; i < Settings.CANNON_COUNT; i++) {
             addMissile(i);
         }
     }
@@ -166,6 +166,8 @@ public class mainPaneController {
         allAttractors.get(2).setLocation(0.1 * playBoard.getPrefWidth(),0.2 * playBoard.getPrefHeight());
         allCannons.get(1).setLocation(0.8 * playBoard.getPrefWidth(),0.3 * playBoard.getPrefHeight());
         allMissiles.get(1).setLocation(0.8 * playBoard.getPrefWidth(),0.3 * playBoard.getPrefHeight());
+        allCannons.get(2).setLocation(0.5 * playBoard.getPrefWidth(),1.0 * playBoard.getPrefHeight());
+        allMissiles.get(2).setLocation(0.5 * playBoard.getPrefWidth(),1.0 * playBoard.getPrefHeight());
     }
     private void startAttack(int i){
         if(!allMonsters.isEmpty()){
@@ -197,13 +199,16 @@ public class mainPaneController {
         for (int i = 0 ; i < allMonsters.size(); i++) {
             monsterMove(i);
         }
-        for (int i = 0; i < Settings.MISSILE_COUNT; i++) {
+        for (int i = 0; i < Settings.CANNON_COUNT; i++) {
             startAttack(i);
         }
+        // rotate the cannon
+        CannonRotate();
 
         // move monsters and missiles
         allMonsters.forEach(Sprite::moveMonster);
         allMissiles.forEach(Sprite::moveMissile);
+        allCannons.forEach(Sprite::moveCannon);
 
         // update scene
         updateScene();
@@ -225,17 +230,14 @@ public class mainPaneController {
                 } else if (nthMonster.isInCheckPoint(nthMonster,firstBase)) {
                     nthMonster.follow(secondBase);
                     nthMonster.setFlag(1);
-                    System.out.println("FIRST BASE");
                 } else if (nthMonster.isInCheckPoint(nthMonster,secondBase)) {
                     nthMonster.follow(thirdBase);
                     nthMonster.setFlag(2);
-                    System.out.println("SECOND BASE");
                 } else if (nthMonster.getFlag() == 1) {
                     nthMonster.follow(secondBase);
                 } else if (nthMonster.getFlag() == 2 && !nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
                     nthMonster.follow(thirdBase);
                 } else if (nthMonster.getFlag() == 2 && nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
-                    System.out.println("LAST BASE");
                     gameLoop.stop();
                     nthMonster.setVisible(false);
                     allMonsters.clear();
@@ -244,6 +246,16 @@ public class mainPaneController {
             }
 
 
+    }
+    public void CannonRotate(){
+        if (allMonsters.iterator().hasNext()) {
+            Monster nthMonster = allMonsters.get(0);
+            Cannon nthCannon=null;
+            for (int i = 0; i < allCannons.size(); i++) {
+                nthCannon=allCannons.get(i);
+                nthCannon.follow(nthMonster.getLocation());
+            }
+        }
     }
 
 

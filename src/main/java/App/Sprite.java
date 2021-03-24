@@ -13,7 +13,7 @@ public abstract class Sprite extends Region {
 
 
     double maxSpeed=0.8;
-    double missileSpeed=5;
+    double missileSpeed=4;
     double maxForce=0.5;
     double maxForceM=0.7;
 
@@ -25,7 +25,7 @@ public abstract class Sprite extends Region {
     double height;
     double centerX;
     double centerY;
-
+    double angle;
     Pane layer = null;
 
     public Sprite(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
@@ -56,6 +56,8 @@ public abstract class Sprite extends Region {
 
     public void display() {
        relocate(location.x - centerX, location.y - centerY);
+
+        setRotate(Math.toDegrees( angle));
     }
 
     public Vector2D getLocation(){
@@ -100,6 +102,13 @@ public abstract class Sprite extends Region {
     }
     public void moveMonster() {
         moveObject(acceleration,velocity,maxSpeed,location);
+    }
+    public void moveCannon(){
+
+        velocity.add(acceleration);
+        velocity.limit(maxSpeed);
+        angle = velocity.heading2D();
+        acceleration.multiply(0);
     }
     public void moveObject(Vector2D acceleration, Vector2D velocity, double maxSpeed, Vector2D location){
         velocity.add(acceleration);
