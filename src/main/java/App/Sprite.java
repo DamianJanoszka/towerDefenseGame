@@ -12,7 +12,7 @@ public abstract class Sprite extends Region {
     Vector2D acceleration;
 
 
-    double maxSpeed=0.8;
+    double maxSpeed=0.6;
     double missileSpeed=4;
     double maxForce=0.5;
     double maxForceM=0.7;
@@ -137,4 +137,8 @@ public abstract class Sprite extends Region {
                 (monster.subtractTolerance().isLessThan(location));
     }
 
+    public void setLocationOffset(double offsetX, double offsetY) {
+        location.x += offsetX;
+        location.y += offsetY;
+    }
 }

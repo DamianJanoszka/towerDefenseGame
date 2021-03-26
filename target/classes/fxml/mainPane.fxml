@@ -14,8 +14,7 @@
             prefHeight="650.0"
             prefWidth="1000.0"
             xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="App.Controller.mainPaneController">
+            xmlns:fx="http://javafx.com/fxml" fx:controller="App.Controller.mainPaneController">
    <center>
       <Pane fx:id="playBoard" prefHeight="600.0" prefWidth="900.0" BorderPane.alignment="CENTER" />
    </center>
@@ -26,10 +25,11 @@
                <VBox.margin>
                   <Insets bottom="5.0" top="2.0" />
                </VBox.margin></Button>
-            <ToggleButton fx:id="pauseButton_v2" mnemonicParsing="false" text="Pause">
+            <ToggleButton fx:id="pauseButton_v2" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Pause">
                <VBox.margin>
                   <Insets bottom="5.0" />
                </VBox.margin></ToggleButton>
+            <Button fx:id="restartButton" mnemonicParsing="false" text="Restart" />
          </children>
       </VBox>
    </left>

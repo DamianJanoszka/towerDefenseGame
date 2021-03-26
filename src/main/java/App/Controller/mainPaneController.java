@@ -3,6 +3,7 @@ package App.Controller;
 import App.*;
 import App.ExternalLibraries.PausableAnimationTimer;
 import App.GameSettings.Settings;
+import App.MouseEvents.MouseActions;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
@@ -21,6 +22,8 @@ public class mainPaneController {
     private ToggleButton pauseButton_v2;
     @FXML
     private Button playButton;
+    @FXML
+    private Button restartButton;
 
 
     List<Monster> allMonsters = new ArrayList<>();
@@ -29,6 +32,7 @@ public class mainPaneController {
     List<CannonRange> allCannonsRange = new ArrayList<>();
     List<CannonMissile> allMissiles = new ArrayList<>();
 
+    MouseActions mouseActions = new MouseActions();
 
     PausableAnimationTimer gameLoop = new PausableAnimationTimer() {
         @Override
@@ -37,9 +41,11 @@ public class mainPaneController {
     };
 
     private void addMonsters() {
+
         // start location
         double x = 1 * playBoard.getPrefWidth() + 150;
         double y = 0.5 * playBoard.getPrefHeight();
+
         // enemy size
         double width = Settings.MONSTER_SIZE;
         double height = Settings.MONSTER_SIZE;
@@ -55,10 +61,13 @@ public class mainPaneController {
         // register monster
         allMonsters.add(monster);
     }
+
     private void addCannon(){
+
         // start location
         double x = 0.2 * playBoard.getPrefWidth();
         double y = 0.4 * playBoard.getPrefHeight();
+
         // cannon size
         double width = 45;
         double height = width;
@@ -76,6 +85,7 @@ public class mainPaneController {
         allCannons.add(cannon);
         allCannonsRange.add(cannonRange);
     }
+
     private void addMissile(int i){
 
         // missile size
@@ -85,13 +95,16 @@ public class mainPaneController {
         // missile start location
         double  x= allCannons.get(i).getLocation().getX();
         double  y= allCannons.get(i).getLocation().getY();
+
         // create missile data
         Vector2D location = new Vector2D( x,y);
         Vector2D velocity = new Vector2D( 0,0);
         Vector2D acceleration = new Vector2D( 0,0);
+
         // create missile
         CannonMissile missile = new CannonMissile( playBoard, location, velocity, acceleration, width, height);
         missile.setCannonID(i);
+
         // register missile
         allMissiles.add(missile);
     }
@@ -117,6 +130,7 @@ public class mainPaneController {
             @Override
             public void handle(long now) {
                 monsterRoute();
+
             }
 
             @Override
@@ -131,10 +145,8 @@ public class mainPaneController {
 
     public void initialize(){
         playBoard.setOpacity(0.5);
-
-        playPauseSwitchPressed();
-
-        // adding checkPoints and monsters
+        playBoard.toBack();
+        // adding checkPoints, monsters and cannons
         prepareGame();
 
         // setting checkPoints and cannons
@@ -142,6 +154,9 @@ public class mainPaneController {
 
         // update scene
         updateScene();
+
+        // add mouse listeners
+        addListeners();
 
         // run animation loop
         startGame();
@@ -202,13 +217,14 @@ public class mainPaneController {
         for (int i = 0; i < Settings.CANNON_COUNT; i++) {
             startAttack(i);
         }
+        // blocking the missile from firing while moving the cannons
+        blockMissile();
+
         // rotate the cannon
         CannonRotate();
 
         // move monsters and missiles
-        allMonsters.forEach(Sprite::moveMonster);
-        allMissiles.forEach(Sprite::moveMissile);
-        allCannons.forEach(Sprite::moveCannon);
+        moveObjects();
 
         // update scene
         updateScene();
@@ -258,13 +274,24 @@ public class mainPaneController {
         }
     }
 
+    public void addListeners(){
 
-    public void playPauseSwitchPressed() {
+        for(int i=0; i<allCannons.size();i++) {
+            mouseActions.makeDraggable(allCannonsRange.get(i));
+        }
+
         playButton.setOnAction(event -> {
-
             playBoard.setOpacity(1);
             gameLoop.start();
         });
+
+        restartButton.setOnAction(event -> {
+        });
+
+        playPauseSwitchPressed();
+    }
+    public void playPauseSwitchPressed() {
+
         pauseButton_v2.setOnAction(event -> {
             if(pauseButton_v2.isSelected()){
                 gameLoop.stop();
@@ -289,5 +316,23 @@ public class mainPaneController {
         allMissiles.forEach(Sprite::display);
         allCannons.forEach(Sprite::display);
         allCannonsRange.forEach(Sprite::display);
+    }
+    public void blockMissile(){
+        for (int i = 0; i < allCannons.size(); i++) {
+            Stream<CannonMissile> missiles = allMissiles.stream();
+            int id = i;
+            Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID()== id);
+            List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
+            CannonMissile nthMissile=nthMissiles.iterator().next();
+            if(allCannonsRange.get(i).isPressed()){
+            nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
+            }
+        }
+
+    }
+    public void moveObjects(){
+        allMonsters.forEach(Sprite::moveMonster);
+        allMissiles.forEach(Sprite::moveMissile);
+        allCannons.forEach(Sprite::moveCannon);
     }
 }
