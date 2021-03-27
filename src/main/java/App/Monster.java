@@ -11,11 +11,22 @@ public class Monster extends Sprite {
 
     private int monsterHealth;
     private int flag;
+    private int monsterID;
+    private int goldPrice;
 
     public Monster(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
         setMonsterHealth(Settings.MONSTER_HEALTH);
         setFlag(Settings.MONSTER_FLAG);
+        setGoldPrice(Settings.MONSTER_GOLD);
+    }
+
+    public int getGoldPrice() {
+        return goldPrice;
+    }
+
+    public void setGoldPrice(int goldPrice) {
+        this.goldPrice = goldPrice;
     }
 
     public int getMonsterHealth() {
@@ -32,6 +43,14 @@ public class Monster extends Sprite {
 
     public void setFlag(int flag) {
         this.flag = flag;
+    }
+
+    public int getMonsterID() {
+        return monsterID;
+    }
+
+    public void setMonsterID(int monsterID) {
+        this.monsterID = monsterID;
     }
 
     public void healthAfterHit(CannonMissile cannonMissile){

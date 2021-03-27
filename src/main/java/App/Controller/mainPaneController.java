@@ -4,12 +4,22 @@ import App.*;
 import App.ExternalLibraries.PausableAnimationTimer;
 import App.GameSettings.Settings;
 import App.MouseEvents.MouseActions;
+import App.Player.gamePlayer;
+import javafx.beans.property.IntegerProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +34,14 @@ public class mainPaneController {
     private Button playButton;
     @FXML
     private Button restartButton;
+    @FXML
+    private Label goldAmount;
+    @FXML
+    private Pane leftMenuBar;
+    @FXML
+    private Button buyCannonButton;
+    @FXML
+    private TextArea infoTextArea;
 
 
     List<Monster> allMonsters = new ArrayList<>();
@@ -33,17 +51,17 @@ public class mainPaneController {
     List<CannonMissile> allMissiles = new ArrayList<>();
 
     MouseActions mouseActions = new MouseActions();
-
+    App.Player.gamePlayer gamePlayer = new gamePlayer();
     PausableAnimationTimer gameLoop = new PausableAnimationTimer() {
         @Override
         public void tick(long animationTime) {
         }
     };
 
-    private void addMonsters() {
+    private void addMonsters(int i) {
 
         // start location
-        double x = 1 * playBoard.getPrefWidth() + 150;
+        double x = 1 * playBoard.getPrefWidth() + 5 + i*30;
         double y = 0.5 * playBoard.getPrefHeight();
 
         // enemy size
@@ -55,9 +73,10 @@ public class mainPaneController {
         Vector2D velocity = new Vector2D( 0,0);
         Vector2D acceleration = new Vector2D( 0,0);
 
+
         // create monster
         Monster monster = new Monster( playBoard, location, velocity, acceleration, width, height);
-
+        monster.setMonsterID(i);
         // register monster
         allMonsters.add(monster);
     }
@@ -65,8 +84,8 @@ public class mainPaneController {
     private void addCannon(){
 
         // start location
-        double x = 0.2 * playBoard.getPrefWidth();
-        double y = 0.4 * playBoard.getPrefHeight();
+        double x = 0.1 * playBoard.getPrefWidth();
+        double y = 1 * playBoard.getPrefHeight();
 
         // cannon size
         double width = 45;
@@ -139,13 +158,11 @@ public class mainPaneController {
             }
         };
 
-       // gameLoop.start();
 
     }
 
     public void initialize(){
-        playBoard.setOpacity(0.5);
-        playBoard.toBack();
+        setLayoutParameters();
         // adding checkPoints, monsters and cannons
         prepareGame();
 
@@ -163,7 +180,7 @@ public class mainPaneController {
     }
     private void prepareGame() {
         for(int i = 0; i < Settings.MONSTER_COUNT; i++) {
-            addMonsters();
+            addMonsters(i);
         }
         for(int i = 0; i < Settings.ATTRACTOR_COUNT; i++) {
             addAttractor();
@@ -181,50 +198,57 @@ public class mainPaneController {
         allAttractors.get(2).setLocation(0.1 * playBoard.getPrefWidth(),0.2 * playBoard.getPrefHeight());
         allCannons.get(1).setLocation(0.8 * playBoard.getPrefWidth(),0.3 * playBoard.getPrefHeight());
         allMissiles.get(1).setLocation(0.8 * playBoard.getPrefWidth(),0.3 * playBoard.getPrefHeight());
-        allCannons.get(2).setLocation(0.5 * playBoard.getPrefWidth(),1.0 * playBoard.getPrefHeight());
-        allMissiles.get(2).setLocation(0.5 * playBoard.getPrefWidth(),1.0 * playBoard.getPrefHeight());
     }
     private void startAttack(int i){
         if(!allMonsters.isEmpty()){
-           Monster nthMonster=allMonsters.iterator().next();
-            Stream<CannonMissile> missiles = allMissiles.stream();
-            Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID()==i);
-            List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
 
-           CannonMissile nthMissile=nthMissiles.iterator().next();
-           if(!(nthMonster.isInRange(nthMonster,nthMissile)) ) {
-               nthMissile.attack(nthMonster.getLocation());}
-           else if(nthMonster.isInRange(nthMonster,nthMissile))
-           {
-               nthMissile.setVisible(false);
-               allMissiles.remove(nthMissile);
-               addMissile(i);
-               nthMonster.healthAfterHit(nthMissile);
-               if(nthMonster.getMonsterHealth()<=0){
-                   allMonsters.remove(nthMonster);
-                   nthMonster.setFlag(0);
-                   nthMonster.setVisible(false);
-                   System.out.println("Zabiles potwora");
-               }
-               System.out.println(nthMonster.getMonsterHealth());
-           }
-        }
+                Stream<CannonMissile> missiles = allMissiles.stream();
+                Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID()==i%allCannons.size());
+                List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
+                CannonMissile nthMissile=nthMissiles.iterator().next();
+
+                Monster nthMonster=allMonsters.iterator().next();
+
+                if(nthMonster.isInFieldOnFire(nthMissile.getLocation())){
+                   if(!(nthMonster.isInRange(nthMonster,nthMissile)) ) {
+                       nthMissile.attack(nthMonster.getLocation());}
+                   else if(nthMonster.isInRange(nthMonster,nthMissile)) {
+                       nthMissile.setVisible(false);
+                       allMissiles.remove(nthMissile);
+                       addMissile(i%allCannons.size());
+                       nthMonster.healthAfterHit(nthMissile);
+                       if(nthMonster.getMonsterHealth()<=0){
+                           gamePlayer.addGold(nthMonster.getGoldPrice());
+                           allMonsters.remove(nthMonster);
+                           nthMonster.setFlag(0);
+                           nthMonster.setVisible(false);
+                           System.out.println("Zabiles potwora");
+                       }
+                       System.out.println(nthMonster.getMonsterHealth());
+                   }
+                }
+
+            }
+
     }
+
     private void monsterRoute() {
         for (int i = 0 ; i < allMonsters.size(); i++) {
             monsterMove(i);
+
         }
-        for (int i = 0; i < Settings.CANNON_COUNT; i++) {
+        for (int i = 0; i < Settings.MONSTER_COUNT; i++) {
             startAttack(i);
         }
-        // blocking the missile from firing while moving the cannons
-        blockMissile();
 
         // rotate the cannon
         CannonRotate();
 
         // move monsters and missiles
         moveObjects();
+
+        // blocking the missile from firing while moving the cannons
+        blockMissile();
 
         // update scene
         updateScene();
@@ -254,14 +278,26 @@ public class mainPaneController {
                 } else if (nthMonster.getFlag() == 2 && !nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
                     nthMonster.follow(thirdBase);
                 } else if (nthMonster.getFlag() == 2 && nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
-                    gameLoop.stop();
-                    nthMonster.setVisible(false);
-                    allMonsters.clear();
-                    playBoard.setOpacity(0.5);
+                  gameOver();
                 }
             }
 
+    }
 
+    private void gameOver() {  gameLoop.stop();
+        allMonsters.forEach(e->e.setVisible(false));
+        allMonsters.clear();
+        playBoard.setOpacity(0.5);
+        gamePlayer.setGold(0);
+        for (int i = allCannons.size()-1; i < Settings.CANNON_COUNT; i--) {
+            allCannonsRange.get(i).setVisible(false);
+            allCannons.get(i).setVisible(false);
+            allMissiles.get(i).setVisible(false);
+            allCannons.remove(allCannons.get(i));
+            allCannonsRange.remove(allCannons.get(i));
+            allMissiles.remove(allCannons.get(i));
+
+        }
     }
     public void CannonRotate(){
         if (allMonsters.iterator().hasNext()) {
@@ -286,7 +322,28 @@ public class mainPaneController {
         });
 
         restartButton.setOnAction(event -> {
+            for (int i = 0; i < 8; i++) {
+                addMonsters(i);
+            }
         });
+
+        buyCannonButton.setOnAction(event -> {
+            if(gamePlayer.buyCannon()){
+                addCannon();
+                addMissile(allCannons.size()-1);
+                addListeners();
+            }
+            else{
+                infoTextArea.setText("Not enought gold");
+            }
+        });
+        buyCannonButton.setOnMouseEntered(event->{
+                infoTextArea.setText("Cost: " + Settings.CANNON_COST);
+        });
+        buyCannonButton.setOnMouseExited(event->{
+            infoTextArea.clear();
+        });
+
 
         playPauseSwitchPressed();
     }
@@ -316,6 +373,8 @@ public class mainPaneController {
         allMissiles.forEach(Sprite::display);
         allCannons.forEach(Sprite::display);
         allCannonsRange.forEach(Sprite::display);
+
+        goldAmount.setText(Integer.toString(gamePlayer.getGold()));
     }
     public void blockMissile(){
         for (int i = 0; i < allCannons.size(); i++) {
@@ -334,5 +393,11 @@ public class mainPaneController {
         allMonsters.forEach(Sprite::moveMonster);
         allMissiles.forEach(Sprite::moveMissile);
         allCannons.forEach(Sprite::moveCannon);
+    }
+    public void setLayoutParameters(){
+        playBoard.setOpacity(0.5);
+        playBoard.toBack();
+        leftMenuBar.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        infoTextArea.setWrapText(true);
     }
 }

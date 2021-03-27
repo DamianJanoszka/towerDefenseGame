@@ -5,6 +5,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public abstract class Sprite extends Region {
 
     Vector2D location;
@@ -12,7 +17,6 @@ public abstract class Sprite extends Region {
     Vector2D acceleration;
 
 
-    double maxSpeed=0.6;
     double missileSpeed=4;
     double maxForce=0.5;
     double maxForceM=0.7;
@@ -71,10 +75,10 @@ public abstract class Sprite extends Region {
         return toleranceAmount(0.98);
     }
     public Vector2D addMissileTolerance(){
-        return toleranceAmount(1.06);
+        return toleranceAmount(1.05);
     }
     public Vector2D subtractMissileTolerance(){
-        return toleranceAmount(0.94);
+        return toleranceAmount(0.95);
     }
     public Vector2D toleranceAmount(double amount){
         double x = location.x*amount;
@@ -92,21 +96,21 @@ public abstract class Sprite extends Region {
         Vector2D range = Vector2D.subtract(target,location);
         double distance = range.magnitude();
         if(distance < Settings.CANNON_RANGE){
-        followTarget(target,location,missileSpeed,maxForceM,velocity);}
+        followTarget(target,location,Settings.MISSILE_SPEED,maxForceM,velocity);}
     }
     public void moveMissile() {
-        moveObject(acceleration,velocity,missileSpeed,location);
+        moveObject(acceleration,velocity,Settings.MISSILE_SPEED,location);
     }
     public void follow(Vector2D target){
-        followTarget(target,location,maxSpeed,maxForce,velocity);
+        followTarget(target,location,Settings.MONSTER_SPEED,maxForce,velocity);
     }
     public void moveMonster() {
-        moveObject(acceleration,velocity,maxSpeed,location);
+        moveObject(acceleration,velocity,Settings.MONSTER_SPEED,location);
     }
     public void moveCannon(){
 
         velocity.add(acceleration);
-        velocity.limit(maxSpeed);
+        velocity.limit(Settings.MONSTER_SPEED);
         angle = velocity.heading2D();
         acceleration.multiply(0);
     }
@@ -136,9 +140,28 @@ public abstract class Sprite extends Region {
         return monster.addTolerance().isGreaterThan(location) &&
                 (monster.subtractTolerance().isLessThan(location));
     }
+    public boolean isInFieldOnFire(Vector2D target){
+        Vector2D range = Vector2D.subtract(target,location);
+        double distance = range.magnitude();
+        return distance<Settings.CANNON_RANGE;
+    }
 
     public void setLocationOffset(double offsetX, double offsetY) {
         location.x += offsetX;
         location.y += offsetY;
     }
+
+
+    public Monster getNearestMonsterV2(List<Monster> listOfMonster, Monster alternativeMonster, Vector2D canonLocation){
+
+        Stream<Monster> monsters = listOfMonster.stream();
+        Monster monster1 = monsters.filter(monster -> monster.isInFieldOnFire(canonLocation))
+                .min(Comparator.comparing(Monster::getMonsterID))
+                .orElse(alternativeMonster);
+
+        return monster1;
+    }
+
+
+
 }

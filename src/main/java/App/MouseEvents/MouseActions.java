@@ -19,7 +19,8 @@ public class MouseActions {
 
         @Override
         public void handle(MouseEvent event) {
-
+            Sprite sprite = (Sprite) event.getSource();
+            sprite.setOpacity(1);
             dragContext.x = event.getSceneX();
             dragContext.y = event.getSceneY();
 
@@ -48,6 +49,8 @@ public class MouseActions {
 
         @Override
         public void handle(MouseEvent event) {
+            Sprite sprite = (Sprite) event.getSource();
+            sprite.setOpacity(0.2);
 
         }
     };
