@@ -5,21 +5,19 @@ import App.ExternalLibraries.PausableAnimationTimer;
 import App.GameSettings.Settings;
 import App.MouseEvents.MouseActions;
 import App.Player.gamePlayer;
-import javafx.beans.property.IntegerProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,6 +40,8 @@ public class mainPaneController {
     private Button buyCannonButton;
     @FXML
     private TextArea infoTextArea;
+    @FXML
+    private Button addEnemyButton;
 
 
     List<Monster> allMonsters = new ArrayList<>();
@@ -51,7 +51,7 @@ public class mainPaneController {
     List<CannonMissile> allMissiles = new ArrayList<>();
 
     MouseActions mouseActions = new MouseActions();
-    App.Player.gamePlayer gamePlayer = new gamePlayer();
+    gamePlayer gamePlayer = new gamePlayer();
     PausableAnimationTimer gameLoop = new PausableAnimationTimer() {
         @Override
         public void tick(long animationTime) {
@@ -77,6 +77,7 @@ public class mainPaneController {
         // create monster
         Monster monster = new Monster( playBoard, location, velocity, acceleration, width, height);
         monster.setMonsterID(i);
+
         // register monster
         allMonsters.add(monster);
     }
@@ -161,7 +162,7 @@ public class mainPaneController {
 
     }
 
-    public void initialize(){
+    public void initialize() throws FileNotFoundException {
         setLayoutParameters();
         // adding checkPoints, monsters and cannons
         prepareGame();
@@ -200,7 +201,7 @@ public class mainPaneController {
         allMissiles.get(1).setLocation(0.8 * playBoard.getPrefWidth(),0.3 * playBoard.getPrefHeight());
     }
     private void startAttack(int i){
-        if(!allMonsters.isEmpty()){
+        if(!allMonsters.isEmpty() && !allMissiles.isEmpty()){
 
                 Stream<CannonMissile> missiles = allMissiles.stream();
                 Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID()==i%allCannons.size());
@@ -208,10 +209,12 @@ public class mainPaneController {
                 CannonMissile nthMissile=nthMissiles.iterator().next();
 
                 Monster nthMonster=allMonsters.iterator().next();
+                checkingIfMissileLostTheWay();
 
                 if(nthMonster.isInFieldOnFire(nthMissile.getLocation())){
                    if(!(nthMonster.isInRange(nthMonster,nthMissile)) ) {
-                       nthMissile.attack(nthMonster.getLocation());}
+                       nthMissile.followMonster(nthMonster.getLocation());
+                    }
                    else if(nthMonster.isInRange(nthMonster,nthMissile)) {
                        nthMissile.setVisible(false);
                        allMissiles.remove(nthMissile);
@@ -223,6 +226,8 @@ public class mainPaneController {
                            nthMonster.setFlag(0);
                            nthMonster.setVisible(false);
                            System.out.println("Zabiles potwora");
+                           nextMonsterWave(allMonsters, Settings.MONSTER_COUNT);
+
                        }
                        System.out.println(nthMonster.getMonsterHealth());
                    }
@@ -232,17 +237,32 @@ public class mainPaneController {
 
     }
 
+    private void checkingIfMissileLostTheWay() {
+        for (int i = 0; i < allCannons.size(); i++) {
+            Stream<CannonMissile> missiles = allMissiles.stream();
+            int id = i;
+            Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID() == id);
+            List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
+            CannonMissile nthMissile = nthMissiles.iterator().next();
+            if (nthMissile.ifMissileLostTheWay(allCannons.get(i))) {
+                nthMissile.setVisible(false);
+                nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
+            }
+        }
+
+    }
+
     private void monsterRoute() {
         for (int i = 0 ; i < allMonsters.size(); i++) {
-            monsterMove(i);
-
+            monsterRoute(i);
         }
-        for (int i = 0; i < Settings.MONSTER_COUNT; i++) {
+
+        for (int i = 0; i < allCannons.size(); i++) {
             startAttack(i);
         }
 
         // rotate the cannon
-        CannonRotate();
+        cannonRotate();
 
         // move monsters and missiles
         moveObjects();
@@ -254,7 +274,7 @@ public class mainPaneController {
         updateScene();
 
     }
-    public void monsterMove(int i) {
+    public void monsterRoute(int i) {
 
         Vector2D firstBase = allAttractors.get(0).getLocation();
         Vector2D secondBase = allAttractors.get(1).getLocation();
@@ -266,17 +286,17 @@ public class mainPaneController {
                 // monster move logic
                 if (nthMonster.getFlag() == 0 &&
                         !(nthMonster.isInCheckPoint(nthMonster,firstBase))) {
-                    nthMonster.follow(firstBase);
+                    nthMonster.followRoute(firstBase);
                 } else if (nthMonster.isInCheckPoint(nthMonster,firstBase)) {
-                    nthMonster.follow(secondBase);
+                    nthMonster.followRoute(secondBase);
                     nthMonster.setFlag(1);
                 } else if (nthMonster.isInCheckPoint(nthMonster,secondBase)) {
-                    nthMonster.follow(thirdBase);
+                    nthMonster.followRoute(thirdBase);
                     nthMonster.setFlag(2);
                 } else if (nthMonster.getFlag() == 1) {
-                    nthMonster.follow(secondBase);
+                    nthMonster.followRoute(secondBase);
                 } else if (nthMonster.getFlag() == 2 && !nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
-                    nthMonster.follow(thirdBase);
+                    nthMonster.followRoute(thirdBase);
                 } else if (nthMonster.getFlag() == 2 && nthMonster.isInCheckPoint(nthMonster,thirdBase)) {
                   gameOver();
                 }
@@ -284,28 +304,27 @@ public class mainPaneController {
 
     }
 
-    private void gameOver() {  gameLoop.stop();
+    private void gameOver() {
         allMonsters.forEach(e->e.setVisible(false));
+        allCannonsRange.forEach(e->e.setVisible(false));
+        allCannons.forEach(e->e.setVisible(false));
+        allMissiles.forEach(e->e.setVisible(false));
+        allMissiles.clear();
         allMonsters.clear();
+        allCannonsRange.clear();
+        allCannons.clear();
         playBoard.setOpacity(0.5);
         gamePlayer.setGold(0);
-        for (int i = allCannons.size()-1; i < Settings.CANNON_COUNT; i--) {
-            allCannonsRange.get(i).setVisible(false);
-            allCannons.get(i).setVisible(false);
-            allMissiles.get(i).setVisible(false);
-            allCannons.remove(allCannons.get(i));
-            allCannonsRange.remove(allCannons.get(i));
-            allMissiles.remove(allCannons.get(i));
-
-        }
+        gamePlayer.setOver(true);
+        gameLoop.stop();
     }
-    public void CannonRotate(){
+    public void cannonRotate(){
         if (allMonsters.iterator().hasNext()) {
             Monster nthMonster = allMonsters.get(0);
             Cannon nthCannon=null;
             for (int i = 0; i < allCannons.size(); i++) {
                 nthCannon=allCannons.get(i);
-                nthCannon.follow(nthMonster.getLocation());
+                nthCannon.followRoute(nthMonster.getLocation());
             }
         }
     }
@@ -321,7 +340,7 @@ public class mainPaneController {
             gameLoop.start();
         });
 
-        restartButton.setOnAction(event -> {
+        addEnemyButton.setOnAction(event -> {
             for (int i = 0; i < 8; i++) {
                 addMonsters(i);
             }
@@ -343,7 +362,28 @@ public class mainPaneController {
         buyCannonButton.setOnMouseExited(event->{
             infoTextArea.clear();
         });
-
+        restartButton.setOnAction(event -> {
+            if(gamePlayer.isOver()){
+                gameLoop.start();
+                for(int i = 0; i < Settings.MONSTER_COUNT; i++) {
+                    addMonsters(i);
+                }
+                for (int i = 0; i < Settings.CANNON_COUNT; i++) {
+                    addCannon();
+                }
+                for (int i = 0; i < Settings.CANNON_COUNT; i++) {
+                    addMissile(i);
+                }
+                gamePlayer.setOver(false);
+                playBoard.setOpacity(1);
+                for(int i=0; i<allCannons.size();i++) {
+                    mouseActions.makeDraggable(allCannonsRange.get(i));
+                }
+            }
+            else {
+                infoTextArea.setText("You have to play it to the end");
+            }
+        });
 
         playPauseSwitchPressed();
     }
@@ -377,27 +417,41 @@ public class mainPaneController {
         goldAmount.setText(Integer.toString(gamePlayer.getGold()));
     }
     public void blockMissile(){
-        for (int i = 0; i < allCannons.size(); i++) {
-            Stream<CannonMissile> missiles = allMissiles.stream();
-            int id = i;
-            Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID()== id);
-            List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
-            CannonMissile nthMissile=nthMissiles.iterator().next();
-            if(allCannonsRange.get(i).isPressed()){
-            nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
+        if(!allMissiles.isEmpty()) {
+            for (int i = 0; i < allCannons.size(); i++) {
+                Stream<CannonMissile> missiles = allMissiles.stream();
+                int id = i;
+                Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID() == id);
+                List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
+                CannonMissile nthMissile = nthMissiles.iterator().next();
+                if (allCannonsRange.get(i).isPressed()) {
+                    nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
+                }
             }
         }
-
     }
     public void moveObjects(){
         allMonsters.forEach(Sprite::moveMonster);
         allMissiles.forEach(Sprite::moveMissile);
         allCannons.forEach(Sprite::moveCannon);
     }
-    public void setLayoutParameters(){
+    public void setLayoutParameters() throws FileNotFoundException {
         playBoard.setOpacity(0.5);
         playBoard.toBack();
         leftMenuBar.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         infoTextArea.setWrapText(true);
+        BackgroundImage myPaint= new BackgroundImage(new Image(getClass().getResource("/img/road3.png").toString()),
+                BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        playBoard.setBackground(new Background(myPaint));
+    }
+    public void nextMonsterWave(List<Monster> monsterList, int monsterAmount){
+        if(monsterList.isEmpty()&& gamePlayer.getWaveAmount()>0){
+            gamePlayer.consumeWave();
+            for (int i = 0; i < 2*monsterAmount; i++) {
+                addMonsters(i);
+                allMonsters.get(i).setMonsterHealth(allMonsters.get(i).getMonsterHealth()+50);
+            }
+        }
     }
 }

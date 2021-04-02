@@ -22,7 +22,6 @@ public class Cannon extends Sprite{
         Rectangle rent = new Rectangle(radius-6,radius-6,35,14);
         rent.setFill(Color.PURPLE.deriveColor(1, 1, 1, 0.5));
 
-
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.BLACK.deriveColor(1, 1, 1, 1));
 
