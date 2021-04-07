@@ -12,5 +12,6 @@ First download and unzip the project, go to your project root folder using cd in
 
 ```sh
 mvn compile
+mvn install
 mvn exec:java -Dexec.mainClass=App.Main
 ```
