@@ -20,6 +20,7 @@ public class Main extends Application {
         Scene scene = new Scene(mainPane);
         stage.setTitle("the Tower Defense game");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
 
 

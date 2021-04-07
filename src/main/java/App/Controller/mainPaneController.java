@@ -15,7 +15,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,11 +224,9 @@ public class mainPaneController {
                            allMonsters.remove(nthMonster);
                            nthMonster.setFlag(0);
                            nthMonster.setVisible(false);
-                           System.out.println("Zabiles potwora");
                            nextMonsterWave(allMonsters, Settings.MONSTER_COUNT);
 
                        }
-                       System.out.println(nthMonster.getMonsterHealth());
                    }
                 }
 
@@ -270,10 +267,16 @@ public class mainPaneController {
         // blocking the missile from firing while moving the cannons
         blockMissile();
 
+        // blocking the cannons after placing them in one position
+        blockCannons();
+
+
         // update scene
         updateScene();
 
     }
+
+
     public void monsterRoute(int i) {
 
         Vector2D firstBase = allAttractors.get(0).getLocation();
@@ -331,9 +334,10 @@ public class mainPaneController {
 
     public void addListeners(){
 
-        for(int i=0; i<allCannons.size();i++) {
+        for(int i=0; i<allCannonsRange.size();i++) {
             mouseActions.makeDraggable(allCannonsRange.get(i));
         }
+
 
         playButton.setOnAction(event -> {
             playBoard.setOpacity(1);
@@ -427,6 +431,13 @@ public class mainPaneController {
                 if (allCannonsRange.get(i).isPressed()) {
                     nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
                 }
+            }
+        }
+    }
+    private void blockCannons() {
+        for(int i=0; i<allCannonsRange.size();i++) {
+            if(allCannonsRange.get(i).getOpacity()<0.24){
+                mouseActions.makeNotDraggable(allCannonsRange.get(i));
             }
         }
     }

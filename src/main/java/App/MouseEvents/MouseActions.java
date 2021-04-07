@@ -14,6 +14,19 @@ public class MouseActions {
         sprite.setOnMouseDragged(onMouseDraggedEventHandler);
         sprite.setOnMouseReleased(onMouseReleasedEventHandler);
     }
+    public void makeNotDraggable(final Sprite sprite){
+        sprite.setOnMousePressed(makeNotDraggableEventHandler);
+        sprite.setOnMouseDragged(makeNotDraggableEventHandler);
+        sprite.setOnMouseReleased(makeNotDraggableEventHandler);
+    }
+    EventHandler<MouseEvent> makeNotDraggableEventHandler = new EventHandler<MouseEvent>() {
+
+        @Override
+        public void handle(MouseEvent event) {
+            Sprite sprite = (Sprite) event.getSource();
+            sprite.setOpacity(1);
+        }
+    };
 
     EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 

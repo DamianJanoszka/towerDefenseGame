@@ -17,7 +17,7 @@ public class Settings {
 
     // monster parameters
     public static int MONSTER_COUNT = 8;
-    public static int MONSTER_HEALTH=400;
+    public static int MONSTER_HEALTH=150;
     public static int MONSTER_FLAG=0;
     public static int MONSTER_SIZE=30;
     public static final int MONSTER_GOLD = 100;
