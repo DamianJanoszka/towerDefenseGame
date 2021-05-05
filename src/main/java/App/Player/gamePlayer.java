@@ -3,9 +3,11 @@ package App.Player;
 import App.GameSettings.Settings;
 
 public class gamePlayer {
+    public final static gamePlayer PLAYER = new gamePlayer();
     private int gold;
     private int waveAmount = Settings.WAVE_AMOUNT;
     private boolean isOver = false;
+    private gamePlayer(){ }
 
     public int getGold() {
         return gold;

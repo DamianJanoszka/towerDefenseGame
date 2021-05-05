@@ -50,7 +50,8 @@ public class mainPaneController {
     List<CannonMissile> allMissiles = new ArrayList<>();
 
     MouseActions mouseActions = new MouseActions();
-    gamePlayer gamePlayer = new gamePlayer();
+    gamePlayer gamePlayer = App.Player.gamePlayer.PLAYER;
+
     PausableAnimationTimer gameLoop = new PausableAnimationTimer() {
         @Override
         public void tick(long animationTime) {
@@ -241,7 +242,7 @@ public class mainPaneController {
             Stream<CannonMissile> correctMissiles = missiles.filter(missile -> missile.getCannonID() == id);
             List<CannonMissile> nthMissiles = correctMissiles.collect(Collectors.toList());
             CannonMissile nthMissile = nthMissiles.iterator().next();
-            if (nthMissile.ifMissileLostTheWay(allCannons.get(i))) {
+            if (nthMissile.ifMissileLostTheWay(allCannons.get(i).getLocation())) {
                 nthMissile.setVisible(false);
                 nthMissile.setLocation(allCannons.get(i).getLocation().getX(), allCannons.get(i).getLocation().getY());
             }

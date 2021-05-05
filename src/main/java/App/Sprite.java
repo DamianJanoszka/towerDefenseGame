@@ -41,7 +41,7 @@ public abstract class Sprite extends Region {
         setPrefSize(width, height);
 
         // add view to this node
-        getChildren().add( view);
+        getChildren().add(view);
 
         // add this node to layer
         layer.getChildren().add( this);
@@ -53,8 +53,7 @@ public abstract class Sprite extends Region {
 
     public void display() {
        relocate(location.x - centerX, location.y - centerY);
-
-        setRotate(Math.toDegrees( angle));
+       setRotate(Math.toDegrees(angle));
     }
 
     public Vector2D getLocation(){
@@ -62,20 +61,26 @@ public abstract class Sprite extends Region {
     }
 
     public Vector2D addTolerance(){
-        return toleranceAmount(1.02);
+        return toleranceAmount(Settings.MONSTER_TOLERANCE);
     }
     public Vector2D subtractTolerance(){
-        return toleranceAmount(0.98);
+        return toleranceAmount(-Settings.MONSTER_TOLERANCE);
     }
     public Vector2D addMissileTolerance(){
-        return toleranceAmount(1.05);
+        return toleranceAmount(Settings.MISSILE_TOLERANCE);
     }
     public Vector2D subtractMissileTolerance(){
-        return toleranceAmount(0.95);
+        return toleranceAmount(-Settings.MISSILE_TOLERANCE);
     }
     public Vector2D toleranceAmount(double amount){
-        double x = location.x*amount;
-        double y = location.y*amount;
+        double x_amount;
+        double y_amount;
+        if(amount < 0 && location.x<Math.abs(amount)) x_amount=-location.x;
+        else x_amount=amount;
+        if(amount < 0 && location.y<Math.abs(amount)) y_amount=-location.y;
+        else y_amount=amount;
+        double x = location.x+x_amount;
+        double y = location.y+y_amount;
         return new Vector2D(x,y);
     }
     public void setLocation(double x, double y){
@@ -84,7 +89,7 @@ public abstract class Sprite extends Region {
     }
     public void applyForce(Vector2D force){
         acceleration.add(force);
-    };
+    }
     public void followMonster(Vector2D target){
         Vector2D range = Vector2D.subtract(target,location);
         double distance = range.magnitude();
@@ -142,8 +147,8 @@ public abstract class Sprite extends Region {
         location.x += offsetX;
         location.y += offsetY;
     }
-    public boolean ifMissileLostTheWay(Cannon cannon){
-        Vector2D range = Vector2D.subtract(cannon.getLocation(),location);
+    public boolean ifMissileLostTheWay(Vector2D cannonLocation){
+        Vector2D range = Vector2D.subtract(cannonLocation,this.location);
         double distance = range.magnitude();
         return distance > 300;
     }
@@ -157,7 +162,6 @@ public abstract class Sprite extends Region {
                 .filter(monster -> monster.isInFieldOnFire(canonLocation))
                 .min(Comparator.comparing(Monster::getMonsterID))
                 .orElse(alternativeMonster);
-
     }
 
 

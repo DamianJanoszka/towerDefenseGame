@@ -13,6 +13,7 @@ public class Cannon extends Sprite{
         super(layer, location, velocity, acceleration, width, height);
     }
 
+
     @Override
     public Node createView() {
         double radius = width / 2;
