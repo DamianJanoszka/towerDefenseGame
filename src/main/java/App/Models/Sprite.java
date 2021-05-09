@@ -1,6 +1,8 @@
-package App;
+package App.Models;
 
+import App.GameObjects.CannonMissile;
 import App.GameSettings.Settings;
+import App.GameObjects.Monster;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -11,19 +13,19 @@ import java.util.stream.Stream;
 
 public abstract class Sprite extends Region {
 
-    Vector2D location;
-    Vector2D velocity;
-    Vector2D acceleration;
+   protected Vector2D location;
+   protected Vector2D velocity;
+   protected Vector2D acceleration;
 
     Node view;
 
     // view dimensions
-    double width;
-    double height;
-    double centerX;
-    double centerY;
-    double angle;
-    Pane layer = null;
+    protected double width;
+    protected double height;
+    protected double centerX;
+    protected double centerY;
+    protected double angle;
+    protected Pane layer = null;
 
     public Sprite(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
 

@@ -1,7 +1,10 @@
-package App;
+package App.GameObjects;
 
 
+import App.GameObjects.CannonMissile;
 import App.GameSettings.Settings;
+import App.Models.Sprite;
+import App.Models.Vector2D;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;

@@ -1,11 +1,13 @@
-package App;
+package App.GameObjects;
 
+import App.Models.Sprite;
+import App.Models.Vector2D;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public class CannonMissile extends Sprite{
+public class CannonMissile extends Sprite {
 
     private int missileDamage;
     private int cannonID;

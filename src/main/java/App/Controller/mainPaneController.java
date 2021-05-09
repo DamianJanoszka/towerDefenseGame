@@ -1,12 +1,15 @@
 package App.Controller;
 
-import App.*;
 import App.ExternalLibraries.PausableAnimationTimer;
+import App.GameObjects.*;
 import App.GameSettings.Settings;
+import App.Models.Sprite;
+import App.Models.Vector2D;
 import App.MouseEvents.MouseActions;
 import App.Player.gamePlayer;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -57,7 +60,6 @@ public class mainPaneController {
         public void tick(long animationTime) {
         }
     };
-
     private void addMonsters(int i) {
 
         // start location
@@ -72,7 +74,6 @@ public class mainPaneController {
         Vector2D location = new Vector2D( x,y);
         Vector2D velocity = new Vector2D( 0,0);
         Vector2D acceleration = new Vector2D( 0,0);
-
 
         // create monster
         Monster monster = new Monster( playBoard, location, velocity, acceleration, width, height);
@@ -89,8 +90,8 @@ public class mainPaneController {
         double y = 1 * playBoard.getPrefHeight();
 
         // cannon size
-        double width = 45;
-        double height = width;
+        double width = Settings.CANNON_SIZE;
+        double height = Settings.CANNON_SIZE;
 
         // create cannon data
         Vector2D location = new Vector2D( x,y);

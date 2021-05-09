@@ -1,6 +1,6 @@
 package App.MouseEvents;
 
-import App.Sprite;
+import App.Models.Sprite;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 

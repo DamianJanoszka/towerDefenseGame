@@ -6,6 +6,7 @@ public class Settings {
     public static int CANNON_COUNT=2;
     public static double CANNON_RANGE=250;
     public static int CANNON_COST = 400;
+    public static int CANNON_SIZE=45;
 
     // missile parameters
     public static int MISSILE_SIZE = 10;

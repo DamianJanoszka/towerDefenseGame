@@ -1,5 +1,10 @@
-package App;
+package App.Models;
 
+import App.GameObjects.Attractor;
+import App.GameObjects.Cannon;
+import App.GameObjects.CannonMissile;
+import App.GameObjects.Monster;
+import App.Models.Vector2D;
 import javafx.scene.layout.Pane;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +27,6 @@ class SpriteTest{
         monster = new Monster(layer, new Vector2D( 0,0), new Vector2D( 0,0), new Vector2D( 0,0), 0, 0);
         layer.setLayoutX(500);
         layer.setLayoutY(500);
-    }
-
-    @Test
-    void getLocation() {
     }
 
     @Test

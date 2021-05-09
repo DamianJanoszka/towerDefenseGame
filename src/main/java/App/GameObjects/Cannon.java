@@ -1,5 +1,7 @@
-package App;
+package App.GameObjects;
 
+import App.Models.Sprite;
+import App.Models.Vector2D;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -7,7 +9,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-public class Cannon extends Sprite{
+public class Cannon extends Sprite {
 
     public Cannon(Pane layer, Vector2D location, Vector2D velocity, Vector2D acceleration, double width, double height) {
         super(layer, location, velocity, acceleration, width, height);
